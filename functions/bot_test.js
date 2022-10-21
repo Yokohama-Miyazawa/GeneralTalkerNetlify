@@ -1,4 +1,5 @@
-const axios = require("axios");
+// const axios = require("axios");
+import axios from 'axios';
 
 const options = {
   method: 'GET',
@@ -19,10 +20,11 @@ const options = {
   }
 };
 
-const chat = () => {
-  axios.request(options).then(function (response) {
+const chat = async () => {
+  console.log("CHAT");
+  return axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
-	  console.log(responseMessage);
+	  console.log("responseMessage:", responseMessage);
     return responseMessage;
   }).catch(function (error) {
 	  console.error(error);
@@ -31,8 +33,11 @@ const chat = () => {
 }
 
 exports.handler = async (event, context) => {
+  console.log("TEST");
+  //let res = await chat();
+  //console.log("res:", res);
   return {
     statusCode: 200,
-    body: chat()
+    body: await chat()
   }
 }
