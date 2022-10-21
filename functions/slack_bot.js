@@ -55,6 +55,7 @@ const chat = async (text) => {
 app.message(async ({ message, say }) => {
   //await say(`${message.text}!`);
   let responseMessage = await chat(message.text);
+  console.log("responseMessage:", responseMessage);
   if(responseMessage) await say(responseMessage);
 });
 
