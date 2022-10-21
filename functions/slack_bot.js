@@ -50,7 +50,7 @@ const chat = async (text) => {
 	  //console.error(error);
     console.log(error.response.status);
     console.log(error.response.statusText);
-    console.log(error.data.message);
+    //console.log(error.response.data.message);
     return null;
   });
 }
