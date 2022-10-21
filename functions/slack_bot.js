@@ -1,5 +1,4 @@
 import { App, ExpressReceiver } from '@slack/bolt';
-//import { WebClient } from '@slack/web-api';
 import axios from 'axios';
 
 const expressReceiver = new ExpressReceiver({
@@ -13,8 +12,6 @@ const app = new App({
   receiver: expressReceiver
 });
 
-//const web = new WebClient(process.env.SLACK_BOT_TOKEN);
-
 function parseRequestBody(stringBody) {
   try {
     return JSON.parse(stringBody ?? "");
@@ -23,8 +20,41 @@ function parseRequestBody(stringBody) {
   }
 }
 
+const chat = async (text) => {
+  console.log("CHAT:", text);
+
+  const options = {
+    method: 'GET',
+    url: 'https://generaltalker.p.rapidapi.com/on_slack/',
+    params: {
+      bot_name: process.env.MY_SLACK_BOT_NAME,
+      user_name: process.env.MY_SLACK_BOT_NAME,
+      channel_token: 'channel1',
+      user_msg_text: text,
+      use_detect_user_info: 'true',
+      save_only_positive_info: 'true',
+      load_only_positive_info: 'true',
+      use_change_topic: 'true'
+    },
+    headers: {
+      'X-RapidAPI-Key': process.env.GENERALTALKER_API_KEY,
+      'X-RapidAPI-Host': 'generaltalker.p.rapidapi.com'
+    }
+  };
+
+  return axios.request(options).then(function (response) {
+    let responseMessage = response.data.response.res;
+	  console.log("responseMessage:", responseMessage);
+    return responseMessage;
+  }).catch(function (error) {
+	  console.error(error);
+    return "ERROR";
+  });
+}
+
 app.message(async ({ message, say }) => {
-  await say(`${message.text}!`);
+  //await say(`${message.text}!`);
+  await say(await chat(message.text));
 });
 
 exports.handler = async (event, context) => {
@@ -54,14 +84,6 @@ exports.handler = async (event, context) => {
   };
   await app.processEvent(slackEvent);
 
-  /*
-  const result = await web.chat.postMessage({
-    token: process.env.SLACK_BOT_TOKEN,
-    text: body.text,
-    channel: body.channel_id,
-  });
-  console.log("result:", result);
-  */
   return {
     statusCode: 200,
     body: "OK"
