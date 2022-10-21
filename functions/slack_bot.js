@@ -1,5 +1,5 @@
 import { App, ExpressReceiver } from '@slack/bolt';
-import { WebClient } from '@slack/web-api';
+//import { WebClient } from '@slack/web-api';
 import axios from 'axios';
 
 const expressReceiver = new ExpressReceiver({
@@ -13,7 +13,7 @@ const app = new App({
   receiver: expressReceiver
 });
 
-const web = new WebClient(process.env.SLACK_BOT_TOKEN);
+//const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 function parseRequestBody(stringBody) {
   try {
@@ -22,6 +22,10 @@ function parseRequestBody(stringBody) {
     return undefined;
   }
 }
+
+app.message(async ({ message, say }) => {
+  await say(`${message.text}!`);
+});
 
 exports.handler = async (event, context) => {
   //console.log(event);
@@ -36,12 +40,28 @@ exports.handler = async (event, context) => {
   }
 
   console.log("not challenge");
+  const slackEvent = {
+    body: payload,
+    ack: async (response) => {
+      return new Promise((resolve, reject) => {
+        resolve();
+        return {
+          statusCode: 200,
+          body: response ?? ""
+        };
+      });
+    },
+  };
+  await app.processEvent(slackEvent);
+
+  /*
   const result = await web.chat.postMessage({
     token: process.env.SLACK_BOT_TOKEN,
     text: body.text,
     channel: body.channel_id,
   });
   console.log("result:", result);
+  */
   return {
     statusCode: 200,
     body: "OK"
