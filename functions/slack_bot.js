@@ -47,29 +47,26 @@ const chat = async (text) => {
 	  console.log("responseMessage:", responseMessage);
     return responseMessage;
   }).catch(function (error) {
-	  console.error(error);
-    return "ERROR";
+	  console.error("error:", error);
+    return null;
   });
 }
 
 app.message(async ({ message, say }) => {
   //await say(`${message.text}!`);
-  await say(await chat(message.text));
+  let responseMessage = await chat(message.text);
+  if(responseMessage) await say(responseMessage);
 });
 
 exports.handler = async (event, context) => {
-  //console.log(event);
   const payload = parseRequestBody(event.body);
-  //console.log("payload:", payload);
   if(payload && payload.type && payload.type === 'url_verification') {
-    console.log("challenge");
     return {
       statusCode: 200,
       body: payload.challenge
     };
   }
 
-  console.log("not challenge");
   const slackEvent = {
     body: payload,
     ack: async (response) => {
