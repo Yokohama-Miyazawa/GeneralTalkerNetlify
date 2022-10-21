@@ -47,7 +47,10 @@ const chat = async (text) => {
 	  console.log("responseMessage:", responseMessage);
     return responseMessage;
   }).catch(function (error) {
-	  console.error("error:", error);
+	  //console.error(error);
+    console.log(error.response.status);
+    console.log(error.response.statusText);
+    console.log(error.data.message);
     return null;
   });
 }
