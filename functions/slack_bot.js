@@ -1,4 +1,4 @@
-import { App, ExpressReceiver } from '@slack/bolt';
+import { App, ExpressReceiver, directMention } from '@slack/bolt';
 import axios from 'axios';
 
 const expressReceiver = new ExpressReceiver({
