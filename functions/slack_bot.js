@@ -57,6 +57,7 @@ const chat = async (text) => {
 
 app.message(directMention(), async ({ message, say }) => {
   //await say(`${message.text}!`);
+  console.log("message:", message);
   let responseMessage = await chat(message.text);
   console.log("responseMessage:", responseMessage);
   if(responseMessage) await say(responseMessage);
