@@ -77,6 +77,8 @@ exports.handler = async (event, context) => {
     ack: async (response) => {
       return new Promise((resolve, reject) => {
         resolve();
+        console.log("payload:", payload);
+        console.log("RESPONSE");
         return {
           statusCode: 200,
           body: response ?? ""
