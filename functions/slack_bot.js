@@ -64,6 +64,7 @@ app.message(directMention(), async ({ message, say }) => {
 });
 
 exports.handler = async (event, context) => {
+  console.log("REQUEST");
   const payload = parseRequestBody(event.body);
   if(payload && payload.type && payload.type === 'url_verification') {
     return {
