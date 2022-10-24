@@ -42,17 +42,17 @@ const chat = async (text, callback) => {
     }
   };
 
-  return axios.request(options).then(function (response) {
+  axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
 	  console.log("responseMessage:", responseMessage);
     callback(responseMessage);
-    return null;
+    //return null;
   }).catch(function (error) {
 	  //console.error(error);
     console.log(error.response.status);
     console.log(error.response.statusText);
     //console.log(error.response.data.message);
-    return null;
+    //return null;
   });
 }
 
