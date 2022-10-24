@@ -20,7 +20,7 @@ function parseRequestBody(stringBody) {
   }
 }
 
-const chat = async (text) => {
+const chat = async (text, callback) => {
   console.log("CHAT:", text);
 
   const options = {
@@ -45,7 +45,8 @@ const chat = async (text) => {
   return axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
 	  console.log("responseMessage:", responseMessage);
-    return responseMessage;
+    callback(responseMessage);
+    return null;
   }).catch(function (error) {
 	  //console.error(error);
     console.log(error.response.status);
@@ -58,9 +59,10 @@ const chat = async (text) => {
 app.message(directMention(), async ({ message, say }) => {
   //await say(`${message.text}!`);
   console.log("message:", message);
-  let responseMessage = await chat(message.text);
-  console.log("responseMessage:", responseMessage);
-  if(responseMessage) await say(responseMessage);
+  //let responseMessage = await chat(message.text);
+  chat(message.text, say);
+  //console.log("responseMessage:", responseMessage);
+  //if(responseMessage) await say(responseMessage);
 });
 
 exports.handler = async (event, context) => {
