@@ -20,6 +20,7 @@ function parseRequestBody(stringBody) {
   }
 }
 
+/*
 const chat = async (text, callback) => {
   console.log("CHAT:", text);
 
@@ -57,14 +58,48 @@ const chat = async (text, callback) => {
     //return null;
   });
 }
+*/
 
 app.message(directMention(), async ({ message, say }) => {
   //await say(`${message.text}!`);
   console.log("message:", message);
+  console.log("message.text", message.text);
   //let responseMessage = await chat(message.text);
-  chat(message.text, say);
+  //chat(message.text, say);
   //console.log("responseMessage:", responseMessage);
   //if(responseMessage) await say(responseMessage);
+  const options = {
+    method: 'GET',
+    url: 'https://generaltalker.p.rapidapi.com/on_slack/',
+    params: {
+      bot_name: process.env.MY_SLACK_BOT_NAME,
+      user_name: process.env.MY_SLACK_BOT_NAME,
+      channel_token: 'channel1',
+      user_msg_text: text,
+      use_detect_user_info: 'true',
+      save_only_positive_info: 'true',
+      load_only_positive_info: 'true',
+      use_change_topic: 'true'
+    },
+    headers: {
+      'X-RapidAPI-Key': process.env.GENERALTALKER_API_KEY,
+      'X-RapidAPI-Host': 'generaltalker.p.rapidapi.com'
+    }
+  };
+  console.log(options);
+
+  axios.request(options).then(function (response) {
+    let responseMessage = response.data.response.res;
+	  console.log("responseMessage:", responseMessage);
+    say(responseMessage);
+    //return null;
+  }).catch(function (error) {
+	  //console.error(error);
+    console.log(error.response.status);
+    console.log(error.response.statusText);
+    //console.log(error.response.data.message);
+    //return null;
+  });
 });
 
 exports.handler = async (event, context) => {
