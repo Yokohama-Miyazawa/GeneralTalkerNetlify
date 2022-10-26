@@ -75,7 +75,7 @@ app.message(directMention(), async ({ message, say }) => {
       bot_name: process.env.MY_SLACK_BOT_NAME,
       user_name: process.env.MY_SLACK_BOT_NAME,
       channel_token: 'channel1',
-      user_msg_text: text,
+      user_msg_text: message.text,
       use_detect_user_info: 'true',
       save_only_positive_info: 'true',
       load_only_positive_info: 'true',
