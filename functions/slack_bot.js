@@ -42,7 +42,7 @@ const chat = async (text, callback) => {
     }
   };
   console.log(options);
-  console.log(say);
+  console.log(callback);
 
   axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
@@ -77,13 +77,13 @@ exports.handler = async (event, context) => {
       body: payload.challenge
     };
   }
+  console.log("payload:", payload);
 
   const slackEvent = {
     body: payload,
     ack: async (response) => {
       return new Promise((resolve, reject) => {
         resolve();
-        console.log("payload:", payload);
         console.log("RESPONSE");
         return {
           statusCode: 200,
