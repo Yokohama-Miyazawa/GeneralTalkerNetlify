@@ -41,6 +41,8 @@ const chat = async (text, callback) => {
       'X-RapidAPI-Host': 'generaltalker.p.rapidapi.com'
     }
   };
+  console.log(options);
+  console.log(say);
 
   axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
@@ -67,6 +69,7 @@ app.message(directMention(), async ({ message, say }) => {
 
 exports.handler = async (event, context) => {
   console.log("REQUEST");
+  console.log(event.body);
   const payload = parseRequestBody(event.body);
   if(payload && payload.type && payload.type === 'url_verification') {
     return {
