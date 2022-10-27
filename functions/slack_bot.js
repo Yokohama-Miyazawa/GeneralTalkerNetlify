@@ -104,7 +104,7 @@ app.message(directMention(), async ({ message, say }) => {
   console.log("app.message end");
 });
 
-exports.handler = async (event, context) => {
+exports.handler = async (event, context, callback) => {
   console.log("REQUEST");
   console.log(event.body);
   const payload = parseRequestBody(event.body);
@@ -116,15 +116,22 @@ exports.handler = async (event, context) => {
   }
   console.log("payload:", payload);
 
+  callback(null, {
+    statusCode: 202,
+    body: ''
+  });
+  console.log("callbacked.");
+
   const slackEvent = {
     body: payload,
     ack: async (response) => {
+      /*
       console.log(response);
       return {
         statusCode: 200,
         body: "OK"
       };
-      /*
+      */
       return new Promise((resolve, reject) => {
         resolve();
         console.log("RESPONSE");
@@ -133,7 +140,6 @@ exports.handler = async (event, context) => {
           body: response ?? ""
         };
       });
-      */
     },
   };
   await app.processEvent(slackEvent);
