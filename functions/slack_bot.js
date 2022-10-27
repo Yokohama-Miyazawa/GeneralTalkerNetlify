@@ -92,6 +92,7 @@ app.message(directMention(), async ({ message, say }) => {
     let responseMessage = response.data.response.res;
 	  console.log("responseMessage:", responseMessage);
     say(responseMessage);
+    console.log("Responsed.");
     //return null;
   }).catch(function (error) {
 	  //console.error(error);
