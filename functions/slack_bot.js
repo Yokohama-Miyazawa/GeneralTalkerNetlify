@@ -100,6 +100,7 @@ app.message(directMention(), async ({ message, say }) => {
     //console.log(error.response.data.message);
     //return null;
   });
+  console.log("app.message end");
 });
 
 exports.handler = async (event, context) => {
