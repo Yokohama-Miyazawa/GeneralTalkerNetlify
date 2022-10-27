@@ -88,7 +88,7 @@ app.message(directMention(), async ({ message, say }) => {
   };
   console.log(options);
 
-  axios.request(options).then(function (response) {
+  await axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
 	  console.log("responseMessage:", responseMessage);
     say(responseMessage);
