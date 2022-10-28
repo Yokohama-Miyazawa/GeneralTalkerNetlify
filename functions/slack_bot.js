@@ -55,7 +55,7 @@ const chat = async (text) => {
   });
 }
 
-app.message(directMention(), async ({ message, say }) => {
+app.message(directMention(), async ({ message, ack, say }) => {
   await ack();
   //await say(`${message.text}!`);
   console.log("message:", message);
