@@ -11,6 +11,7 @@ const app = new App({
   token: `${process.env.SLACK_BOT_TOKEN}`,
   receiver: expressReceiver
 });
+app.start(config.PORT);
 
 function parseRequestBody(stringBody) {
   try {
@@ -71,7 +72,7 @@ exports.handler = async (event, context) => {
       body: payload.challenge
     };
   }
-
+  /*
   const slackEvent = {
     body: payload,
     ack: async (response) => {
@@ -85,6 +86,7 @@ exports.handler = async (event, context) => {
     },
   };
   await app.processEvent(slackEvent);
+  */
 
   return {
     statusCode: 200,
