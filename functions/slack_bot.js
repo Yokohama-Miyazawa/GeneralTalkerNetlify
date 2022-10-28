@@ -21,17 +21,17 @@ function parseRequestBody(stringBody) {
   }
 }
 
-const chat = async (text) => {
-  console.log("CHAT:", text);
+const chat = async (message) => {
+  console.log("CHAT:", message.text);
 
   const options = {
     method: 'GET',
     url: 'https://generaltalker.p.rapidapi.com/on_slack/',
     params: {
       bot_name: process.env.MY_SLACK_BOT_NAME,
-      user_name: process.env.MY_SLACK_BOT_NAME,
-      channel_token: 'channel1',
-      user_msg_text: text,
+      user_name: message.user,
+      channel_token: message.channel,
+      user_msg_text: message.text,
       use_detect_user_info: 'true',
       save_only_positive_info: 'true',
       load_only_positive_info: 'true',
@@ -46,7 +46,7 @@ const chat = async (text) => {
   return axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
 	  console.log("responseMessage:", responseMessage);
-    return responseMessage;
+    return `<@${message.user}> ${responseMessage}`;
   }).catch(function (error) {
 	  //console.error(error);
     console.log(error.response.status);
@@ -59,12 +59,12 @@ const chat = async (text) => {
 app.message(directMention(), async ({ message, say }) => {
   //await say(`${message.text}!`);
   console.log("message:", message);
-  let responseMessage = await chat(message.text);
+  let responseMessage = await chat(message);
   console.log("responseMessage:", responseMessage);
   if(responseMessage) await say(responseMessage);
 });
 
-exports.handler = async (event, context) => {
+exports.handler = async (event, context, callback) => {
   const payload = parseRequestBody(event.body);
   if(payload && payload.type && payload.type === 'url_verification') {
     return {
