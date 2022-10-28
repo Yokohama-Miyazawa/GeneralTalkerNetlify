@@ -3,7 +3,8 @@ import axios from 'axios';
 
 const expressReceiver = new ExpressReceiver({
   signingSecret: `${process.env.SLACK_SIGNING_SECRET}`,
-  processBeforeResponse: true
+  processBeforeResponse: true,
+  unhandledRequestTimeoutMillis: 15000
 });
 
 const app = new App({
