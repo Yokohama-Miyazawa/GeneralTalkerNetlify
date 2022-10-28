@@ -94,5 +94,5 @@ exports.handler = async (event, context) => {
 }
 
 console.log("app start.");
-app.start();
+await app.start();
 console.log("app.started.");
