@@ -11,7 +11,9 @@ const app = new App({
   token: `${process.env.SLACK_BOT_TOKEN}`,
   receiver: expressReceiver
 });
+console.log("app start.");
 app.start();
+console.log("app.started.");
 
 function parseRequestBody(stringBody) {
   try {
