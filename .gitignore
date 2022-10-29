@@ -131,3 +131,9 @@ dist
 
 # Mac
 .DS_Store
+
+# Local Netlify folder
+.netlify
+
+# Local Netlify dev file
+api/*.js
