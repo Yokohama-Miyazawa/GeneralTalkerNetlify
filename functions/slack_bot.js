@@ -46,7 +46,7 @@ const chat = async (message) => {
   return axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
 	  console.log("responseMessage:", responseMessage);
-    return `<@${message.user}> ${message.user}さん、${responseMessage}`;
+    return `<@${message.user}> ${responseMessage}`;
   }).catch(function (error) {
 	  //console.error(error);
     console.log(error.response.status);
