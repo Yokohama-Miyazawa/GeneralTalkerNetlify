@@ -73,22 +73,25 @@ exports.handler = async (event, context, callback) => {
     };
   }
 
+  callback(null, {
+    statusCode: 200,
+    body: "OK"
+  });
+  console.log("calbacked.");
+
   const slackEvent = {
     body: payload,
     ack: async (response) => {
       return new Promise((resolve, reject) => {
         resolve();
+        /*
         return {
           statusCode: 200,
           body: response ?? ""
         };
+        */
       });
     },
   };
   await app.processEvent(slackEvent);
-
-  return {
-    statusCode: 200,
-    body: "OK"
-  }
 }
