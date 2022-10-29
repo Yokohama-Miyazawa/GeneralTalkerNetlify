@@ -32,12 +32,13 @@ const chat = async () => {
   });
 }
 
-exports.handler = async (event, context) => {
+exports.handler = async (event, context, callback) => {
   console.log("TEST");
-  //let res = await chat();
-  //console.log("res:", res);
-  return {
+  callback(null, {
     statusCode: 200,
-    body: await chat()
-  }
+    body: String(new Date())
+  });
+  console.log("calbacked.");
+  let res = await chat();
+  console.log("res:", res);
 }
