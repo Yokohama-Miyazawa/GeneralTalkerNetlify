@@ -6,7 +6,7 @@ const options = {
   url: 'https://generaltalker.p.rapidapi.com/on_slack/',
   params: {
     bot_name: process.env.MY_SLACK_BOT_NAME,
-    user_name: 'UserName',
+    user_name: process.env.MY_SLACK_BOT_NAME,
     channel_token: 'channel1',
     user_msg_text: 'カスピ海ってどこにあるの？',
     use_detect_user_info: 'true',
