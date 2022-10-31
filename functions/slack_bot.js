@@ -73,6 +73,8 @@ exports.handler = async (event, context, callback) => {
     };
   }
 
+  console.log("event:", event);
+  console.log("event.headers:", event.headers);
   if (event.headers['X-Slack-Retry-Num']) {
     console.log("This request have been received already.");
     if (event.headers['X-Slack-Retry-Reason'] === "http_timeout") console.log("because http_timeout");
