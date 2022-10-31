@@ -57,7 +57,7 @@ const chat = async (message) => {
 }
 
 app.message(directMention(), async ({ message, say }) => {
-  console.log("message:", message);
+  //console.log("message:", message);
   let responseMessage = await chat(message);
   //let responseMessage = `${message.text}!`;
   console.log("responseMessage:", responseMessage);
@@ -73,7 +73,7 @@ exports.handler = async (event, context, callback) => {
     };
   }
 
-  console.log("event.headers:", event.headers);
+  //console.log("event.headers:", event.headers);
   if (event.headers['x-slack-retry-num']) {
     console.log("This request have been received already.");
     if (event.headers['x-slack-retry-reason'] === "http_timeout") console.log("because http_timeout");
