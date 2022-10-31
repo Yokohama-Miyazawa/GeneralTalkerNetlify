@@ -73,11 +73,10 @@ exports.handler = async (event, context, callback) => {
     };
   }
 
-  console.log("event:", event);
   console.log("event.headers:", event.headers);
-  if (event.headers['X-Slack-Retry-Num']) {
+  if (event.headers['x-slack-retry-num']) {
     console.log("This request have been received already.");
-    if (event.headers['X-Slack-Retry-Reason'] === "http_timeout") console.log("because http_timeout");
+    if (event.headers['x-slack-retry-reason'] === "http_timeout") console.log("because http_timeout");
     return { statusCode: 200, body: JSON.stringify({ message: "No need to resend" }) };
   }
 
