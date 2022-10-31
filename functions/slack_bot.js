@@ -57,9 +57,9 @@ const chat = async (message) => {
 }
 
 app.message(directMention(), async ({ message, say }) => {
-  //await say(`${message.text}!`);
-  console.log("message:", message);
+  //console.log("message:", message);
   let responseMessage = await chat(message);
+  //let responseMessage = `${message.text}!`;
   console.log("responseMessage:", responseMessage);
   if(responseMessage) await say(responseMessage);
 });
@@ -73,6 +73,19 @@ exports.handler = async (event, context, callback) => {
     };
   }
 
+  //console.log("event.headers:", event.headers);
+  if (event.headers['x-slack-retry-num']) {
+    console.log("This request have been received already.");
+    if (event.headers['x-slack-retry-reason'] === "http_timeout") console.log("because http_timeout");
+    return { statusCode: 200, body: JSON.stringify({ message: "No need to resend" }) };
+  }
+
+  callback(null, {
+    statusCode: 200,
+    body: ''
+  });
+  console.log("calbacked.");
+
   const slackEvent = {
     body: payload,
     ack: async (response) => {
@@ -80,15 +93,16 @@ exports.handler = async (event, context, callback) => {
         resolve();
         return {
           statusCode: 200,
-          body: response ?? ""
+          body: ''
         };
       });
     },
   };
   await app.processEvent(slackEvent);
 
+  console.log("returning...");
   return {
     statusCode: 200,
-    body: "OK"
-  }
+    body: ''
+  };
 }
