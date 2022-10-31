@@ -1,6 +1,8 @@
 import { App, ExpressReceiver, directMention } from '@slack/bolt';
 import axios from 'axios';
 
+let isDailyLimitReached = false;
+
 const expressReceiver = new ExpressReceiver({
   signingSecret: `${process.env.SLACK_SIGNING_SECRET}`,
   processBeforeResponse: true,
@@ -46,12 +48,16 @@ const chat = async (message) => {
   return axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
 	  console.log("responseMessage:", responseMessage);
+    if(isDailyLimitReached) isDailyLimitReached = false;
     return `<@${message.user}> ${responseMessage}`;
   }).catch(function (error) {
-	  //console.error(error);
     console.log(error.response.status);
     console.log(error.response.statusText);
     //console.log(error.response.data.message);
+    if(!isDailyLimitReached) {
+      isDailyLimitReached = true;
+      return "今日はもう喋りたくない";
+    }
     return null;
   });
 }
