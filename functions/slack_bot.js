@@ -91,7 +91,7 @@ exports.handler = async (event, context, callback) => {
   }
 
   callback(null, {
-    statusCode: 200,
+    statusCode: 202,
     body: JSON.stringify({})
   });
   console.log("calbacked.");
