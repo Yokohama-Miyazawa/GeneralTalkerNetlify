@@ -59,7 +59,7 @@ const chat = async (message, botUserId) => {
     let responseMessage = formatResponseText(response.data.response.res, message.user);
 	  console.log("responseMessage:", responseMessage);
     if(isDailyLimitReached) isDailyLimitReached = false;
-    return `<@${message.user}> ${responseMessage}`;
+    return responseMessage;
   }).catch(function (error) {
     console.log(error.response.status);
     console.log(error.response.statusText);
