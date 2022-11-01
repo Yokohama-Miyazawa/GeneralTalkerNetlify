@@ -23,8 +23,13 @@ function parseRequestBody(stringBody) {
   }
 }
 
-const chat = async (message) => {
-  console.log("CHAT:", message.text);
+const removeMentionSymbol = (message, idToBeRemoved) => {
+  return message.replace(`<@${idToBeRemoved}>`, '');
+}
+
+const chat = async (message, botUserId) => {
+  let messageText = removeMentionSymbol(message.text, botUserId);
+  console.log("CHAT:", messageText);
 
   const options = {
     method: 'GET',
@@ -33,7 +38,7 @@ const chat = async (message) => {
       bot_name: process.env.MY_SLACK_BOT_NAME,
       user_name: message.user,
       channel_token: message.channel,
-      user_msg_text: message.text,
+      user_msg_text: messageText,
       use_detect_user_info: 'true',
       save_only_positive_info: 'true',
       load_only_positive_info: 'true',
@@ -62,9 +67,9 @@ const chat = async (message) => {
   });
 }
 
-app.message(directMention(), async ({ message, say }) => {
-  //console.log("message:", message);
-  let responseMessage = await chat(message);
+app.message(directMention(), async ({ message, context, say }) => {
+  let botUserId = context.botUserId;
+  let responseMessage = await chat(message, botUserId);
   //let responseMessage = `${message.text}!`;
   console.log("responseMessage:", responseMessage);
   if(responseMessage) await say(responseMessage);
@@ -79,7 +84,6 @@ exports.handler = async (event, context, callback) => {
     };
   }
 
-  //console.log("event.headers:", event.headers);
   if (event.headers['x-slack-retry-num']) {
     console.log(`This request have been received already. #${event.headers['x-slack-retry-num']}`);
     if (event.headers['x-slack-retry-reason'] === "http_timeout") console.log("because http_timeout");
@@ -94,15 +98,7 @@ exports.handler = async (event, context, callback) => {
 
   const slackEvent = {
     body: payload,
-    ack: async (response) => {
-      return new Promise((resolve, reject) => {
-        resolve();
-        return {
-          statusCode: 200,
-          body: ''
-        };
-      });
-    },
+    ack: async (response) => {return new Promise((resolve, reject) => resolve());},
   };
   await app.processEvent(slackEvent);
 
