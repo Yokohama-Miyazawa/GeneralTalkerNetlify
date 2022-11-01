@@ -50,7 +50,7 @@ function parseRequestBody(stringBody) {
 }
 
 const removeMentionSymbol = (message, idToBeRemoved) => {
-  return message.replace(`<@${idToBeRemoved}>`, '');
+  return message.replaceAll(`<@${idToBeRemoved}>`, '');
 }
 
 const addMentionMark = (text, userId) => {
@@ -110,9 +110,11 @@ app.message(directMention(), async ({ message, context, say }) => {
   };
   let outputText = await chat(inputText);
   //let outputText = `${removeMentionSymbol(message.text, botUserId)}!`;
-  let responseMessage = addMentionMark(replaceYourNameToMentionMark(outputText, message.user), message.user);
-  console.log("responseMessage:", responseMessage);
-  if(responseMessage) await say(responseMessage);
+  if (outputText) {
+    let responseMessage = addMentionMark(replaceYourNameToMentionMark(outputText, message.user), message.user);
+    console.log("responseMessage:", responseMessage);
+    await say(responseMessage);
+  }
 });
 
 app.message(threadByTheBot(), async ({ message, context, say }) => {
@@ -124,9 +126,9 @@ app.message(threadByTheBot(), async ({ message, context, say }) => {
   };
   let outputText = await chat(inputText);
   //let outputText = `${removeMentionSymbol(message.text, botUserId)}?`;
-  let responseMessage = replaceYourNameToMentionMark(outputText, message.user);
-  console.log("responseMessage:", responseMessage);
-  if(responseMessage) {
+  if (outputText) {
+    let responseMessage = replaceYourNameToMentionMark(outputText, message.user);
+    console.log("responseMessage:", responseMessage);
     await app.client.chat.postMessage({
       token: process.env.SLACK_BOT_TOKEN,
       channel: message.channel,
