@@ -15,6 +15,32 @@ const app = new App({
   receiver: expressReceiver
 });
 
+// This listener middleware checks if the message is directed to a thread started by the bot.
+function threadByTheBot() {
+  return async ({ message, context, next }) => {
+    // When context does not have a botUserId in it, then this middleware cannot perform its job. Bail immediately.
+    if (context.botUserId === undefined) {
+      throw new ContextMissingPropertyError(
+        'botUserId',
+        'Cannot match threads of the app without a bot user ID. Ensure authorize callback returns a botUserId.',
+      );
+    }
+
+    if (message.thread_ts == undefined) return;  // This message is not a thread.
+
+    // This thread is not started by the bot.
+    if (message.parent_user_id != context.botUserId) {
+      if(message.subtype == 'thread_broadcast') {
+        if (message.root.user != context.botUserId) return;
+      } else {
+        return;
+      }
+    }
+
+    await next();
+  };
+}
+
 function parseRequestBody(stringBody) {
   try {
     return JSON.parse(stringBody ?? "");
@@ -27,14 +53,17 @@ const removeMentionSymbol = (message, idToBeRemoved) => {
   return message.replace(`<@${idToBeRemoved}>`, '');
 }
 
-const formatResponseText = (text, userId) => {
-  let yourNameWord = '<your_name>';
-  return text.includes(yourNameWord) ? text.replaceAll(yourNameWord, `<@${userId}>`) : `<@${userId}> ${text}`;
+const addMentionMark = (text, userId) => {
+  return `<@${userId}> ${text}`;
 }
 
-const chat = async (message, botUserId) => {
-  let messageText = removeMentionSymbol(message.text, botUserId);
-  console.log("CHAT:", messageText);
+const replaceYourNameToMentionMark = (text, userId) => {
+  let yourNameWord = '<your_name>';
+  return text.replaceAll(yourNameWord, `<@${userId}>`);
+}
+
+const chat = async (message) => {
+  console.log("inputText:", message.text);
 
   const options = {
     method: 'GET',
@@ -43,7 +72,7 @@ const chat = async (message, botUserId) => {
       bot_name: process.env.MY_SLACK_BOT_NAME,
       user_name: message.user,
       channel_token: message.channel,
-      user_msg_text: messageText,
+      user_msg_text: message.text,
       use_detect_user_info: 'true',
       save_only_positive_info: 'true',
       load_only_positive_info: 'true',
@@ -56,8 +85,8 @@ const chat = async (message, botUserId) => {
   };
 
   return axios.request(options).then(function (response) {
-    let responseMessage = formatResponseText(response.data.response.res, message.user);
-	  console.log("responseMessage:", responseMessage);
+    let responseMessage = response.data.response.res;
+	  console.log("outputText:", responseMessage);
     if(isDailyLimitReached) isDailyLimitReached = false;
     return responseMessage;
   }).catch(function (error) {
@@ -74,10 +103,37 @@ const chat = async (message, botUserId) => {
 
 app.message(directMention(), async ({ message, context, say }) => {
   let botUserId = context.botUserId;
-  let responseMessage = await chat(message, botUserId);
-  //let responseMessage = `${message.text}!`;
+  let inputText = {
+    text: removeMentionSymbol(message.text, botUserId),
+    user: message.user,
+    channel: message.channel
+  };
+  let outputText = await chat(inputText);
+  //let outputText = `${removeMentionSymbol(message.text, botUserId)}!`;
+  let responseMessage = addMentionMark(replaceYourNameToMentionMark(outputText, message.user), message.user);
   console.log("responseMessage:", responseMessage);
   if(responseMessage) await say(responseMessage);
+});
+
+app.message(threadByTheBot(), async ({ message, context, say }) => {
+  let botUserId = context.botUserId;
+  let inputText = {
+    text: removeMentionSymbol(message.text, botUserId),
+    user: message.user,
+    channel: message.channel
+  };
+  let outputText = await chat(inputText);
+  //let outputText = `${removeMentionSymbol(message.text, botUserId)}?`;
+  let responseMessage = replaceYourNameToMentionMark(outputText, message.user);
+  console.log("responseMessage:", responseMessage);
+  if(responseMessage) {
+    await app.client.chat.postMessage({
+      token: process.env.SLACK_BOT_TOKEN,
+      channel: message.channel,
+      thread_ts: message.ts,
+      text: responseMessage
+    });
+  }
 });
 
 exports.handler = async (event, context, callback) => {
