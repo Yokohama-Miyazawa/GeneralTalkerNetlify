@@ -27,6 +27,11 @@ const removeMentionSymbol = (message, idToBeRemoved) => {
   return message.replace(`<@${idToBeRemoved}>`, '');
 }
 
+const formatResponseText = (text, userId) => {
+  let yourNameWord = '<your_name>';
+  return text.includes(yourNameWord) ? text.replaceAll(yourNameWord, `<@${userId}>`) : `<@${userId}> ${text}`;
+}
+
 const chat = async (message, botUserId) => {
   let messageText = removeMentionSymbol(message.text, botUserId);
   console.log("CHAT:", messageText);
@@ -51,7 +56,7 @@ const chat = async (message, botUserId) => {
   };
 
   return axios.request(options).then(function (response) {
-    let responseMessage = response.data.response.res;
+    let responseMessage = formatResponseText(response.data.response.res, message.user);
 	  console.log("responseMessage:", responseMessage);
     if(isDailyLimitReached) isDailyLimitReached = false;
     return `<@${message.user}> ${responseMessage}`;
