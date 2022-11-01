@@ -92,7 +92,7 @@ exports.handler = async (event, context, callback) => {
 
   callback(null, {
     statusCode: 200,
-    body: ''
+    body: JSON.stringify({})
   });
   console.log("calbacked.");
 
@@ -105,6 +105,6 @@ exports.handler = async (event, context, callback) => {
   console.log("returning...");
   return {
     statusCode: 200,
-    body: ''
+    body: JSON.stringify({})
   };
 }
