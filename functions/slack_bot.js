@@ -71,7 +71,8 @@ const replaceYourNameToMentionMark = (text, userId) => {
 }
 
 const chat = async (message) => {
-  console.log("inputText:", message.text);
+  let messageText = message.text.trim();
+  console.log("inputText:", messageText);
 
   const options = {
     method: 'GET',
@@ -80,7 +81,7 @@ const chat = async (message) => {
       bot_name: process.env.MY_SLACK_BOT_NAME,
       user_name: message.user,
       channel_token: message.channel,
-      user_msg_text: message.text,
+      user_msg_text: messageText,
       use_detect_user_info: 'true',
       save_only_positive_info: 'true',
       load_only_positive_info: 'true',
