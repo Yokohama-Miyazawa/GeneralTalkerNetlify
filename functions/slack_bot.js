@@ -15,6 +15,14 @@ const app = new App({
   receiver: expressReceiver
 });
 
+// This listener middleware checks if the message is a DM to the bot.
+function directMessageToBot () {
+  return async ({ message, context, next }) => {
+    if(message.channel_type != 'im') return;
+    await next();
+  };
+}
+
 // This listener middleware checks if the message is directed to a thread started by the bot.
 function threadByTheBot() {
   return async ({ message, context, next }) => {
@@ -101,6 +109,22 @@ const chat = async (message) => {
   });
 }
 
+app.message(directMessageToBot(), async ({ message, context, say }) => {
+  let botUserId = context.botUserId;
+  let inputText = {
+    text: removeMentionSymbol(message.text, botUserId),
+    user: message.user,
+    channel: message.channel
+  };
+  let outputText = await chat(inputText);
+  //let outputText = `${removeMentionSymbol(message.text, botUserId)}(＾ω＾)`;
+  if (outputText) {
+    let responseMessage = replaceYourNameToMentionMark(outputText, message.user);
+    console.log("responseMessage:", responseMessage);
+    await say(responseMessage);
+  }
+});
+
 app.message(directMention(), async ({ message, context, say }) => {
   let botUserId = context.botUserId;
   let inputText = {
@@ -117,7 +141,7 @@ app.message(directMention(), async ({ message, context, say }) => {
   }
 });
 
-app.message(threadByTheBot(), async ({ message, context, say }) => {
+app.message(threadByTheBot(), async ({ message, context }) => {
   let botUserId = context.botUserId;
   let inputText = {
     text: removeMentionSymbol(message.text, botUserId),
