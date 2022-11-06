@@ -145,6 +145,7 @@ app.message(directMessageToBot(), async ({ message, context, say }) => {
     channel: message.channel
   };
   let outputText = await chatA3rtTalk(inputText);
+  console.log("outputText:", outputText);
   //let outputText = `${removeMentionSymbol(message.text, botUserId)}(＾ω＾)`;
   if (outputText) {
     let responseMessage = replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), botUserId);
