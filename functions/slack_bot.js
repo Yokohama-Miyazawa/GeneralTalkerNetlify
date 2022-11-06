@@ -87,7 +87,7 @@ const chatA3rtTalk = async (message) => {
   params.append('apikey', apikey);
   params.append('query', messageText);
 
-  axios.post(url, params).then(function (response) {
+  return axios.post(url, params).then(function (response) {
     const responseMessage = response.data.results[0].reply
     console.log("outputText:", responseMessage);
     return responseMessage;
