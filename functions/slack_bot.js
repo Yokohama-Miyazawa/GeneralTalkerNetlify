@@ -70,6 +70,11 @@ const replaceYourNameToMentionMark = (text, userId) => {
   return text.replaceAll(yourNameWord, `<@${userId}>`);
 }
 
+const replaceMyNameToMentionMark = (text, botId) => {
+  let myNameWord = '<my_name>';
+  return text.replaceAll(myNameWord, `<@${botId}>`);
+}
+
 const chat = async (message) => {
   let messageText = message.text.trim();
   console.log("inputText:", messageText);
@@ -120,7 +125,7 @@ app.message(directMessageToBot(), async ({ message, context, say }) => {
   let outputText = await chat(inputText);
   //let outputText = `${removeMentionSymbol(message.text, botUserId)}(＾ω＾)`;
   if (outputText) {
-    let responseMessage = replaceYourNameToMentionMark(outputText, message.user);
+    let responseMessage = replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), botUserId);
     console.log("responseMessage:", responseMessage);
     await say(responseMessage);
   }
@@ -136,7 +141,7 @@ app.message(directMention(), async ({ message, context, say }) => {
   let outputText = await chat(inputText);
   //let outputText = `${removeMentionSymbol(message.text, botUserId)}!`;
   if (outputText) {
-    let responseMessage = addMentionMark(replaceYourNameToMentionMark(outputText, message.user), message.user);
+    let responseMessage = addMentionMark(replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), botUserId), message.user);
     console.log("responseMessage:", responseMessage);
     await say(responseMessage);
   }
@@ -152,7 +157,7 @@ app.message(threadByTheBot(), async ({ message, context }) => {
   let outputText = await chat(inputText);
   //let outputText = `${removeMentionSymbol(message.text, botUserId)}?`;
   if (outputText) {
-    let responseMessage = replaceYourNameToMentionMark(outputText, message.user);
+    let responseMessage = replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), botUserId);
     console.log("responseMessage:", responseMessage);
     await app.client.chat.postMessage({
       token: process.env.SLACK_BOT_TOKEN,
