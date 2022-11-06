@@ -1,5 +1,6 @@
 import { App, ExpressReceiver, directMention } from '@slack/bolt';
 import axios from 'axios';
+import FormData from 'form-data';
 
 let isDailyLimitReached = false;
 
@@ -75,7 +76,28 @@ const replaceMyNameToMentionMark = (text, botId) => {
   return text.replaceAll(myNameWord, `<@${botId}>`);
 }
 
-const chat = async (message) => {
+const chatA3rtTalk = async (message) => {
+  const url = 'https://api.a3rt.recruit.co.jp/talk/v1/smalltalk';
+  const apikey = process.env.A3RT_TALK_API_KEY;
+
+  const messageText = message.text.trim();
+  console.log("inputText:", messageText);
+
+  let params = new FormData();
+  params.append('apikey', apikey);
+  params.append('query', messageText);
+
+  axios.post(url, params).then(function (response) {
+    const responseMessage = response.data.results[0].reply
+    console.log("outputText:", responseMessage);
+    return responseMessage;
+  }).catch(function (error) {
+	  console.error(error);
+    return null;
+  });
+}
+
+const chatGeneralTalker = async (message) => {
   let messageText = message.text.trim();
   console.log("inputText:", messageText);
 
@@ -122,7 +144,7 @@ app.message(directMessageToBot(), async ({ message, context, say }) => {
     user: message.user,
     channel: message.channel
   };
-  let outputText = await chat(inputText);
+  let outputText = await chatA3rtTalk(inputText);
   //let outputText = `${removeMentionSymbol(message.text, botUserId)}(＾ω＾)`;
   if (outputText) {
     let responseMessage = replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), botUserId);
@@ -138,7 +160,7 @@ app.message(directMention(), async ({ message, context, say }) => {
     user: message.user,
     channel: message.channel
   };
-  let outputText = await chat(inputText);
+  let outputText = await chatA3rtTalk(inputText);
   //let outputText = `${removeMentionSymbol(message.text, botUserId)}!`;
   if (outputText) {
     let responseMessage = addMentionMark(replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), botUserId), message.user);
@@ -154,7 +176,7 @@ app.message(threadByTheBot(), async ({ message, context }) => {
     user: message.user,
     channel: message.channel
   };
-  let outputText = await chat(inputText);
+  let outputText = await chatA3rtTalk(inputText);
   //let outputText = `${removeMentionSymbol(message.text, botUserId)}?`;
   if (outputText) {
     let responseMessage = replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), botUserId);
