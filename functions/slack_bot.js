@@ -146,7 +146,7 @@ const chat = async (message, context) => {
     channel: message.channel
   };
   const outputText = (chatMode == 'a3rt') ? await chatA3rtTalk(inputText) : await chatGeneralTalker(inputText);
-  return replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), context.botUserId);
+  return outputText ? replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), context.botUserId) : outputText;
 }
 
 app.message(directMessageToBot(), async ({ message, context, say }) => {
