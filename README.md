@@ -1,8 +1,8 @@
 # GeneralTalkerNetlify  
-[GeneralTalker](https://rapidapi.com/ja/morikatroninc-morikatroninc-default/api/generaltalker/details)を[Netlify Functions](https://functions.netlify.com/)で使うためのプログラム  
+[GeneralTalker API](https://rapidapi.com/ja/morikatroninc-morikatroninc-default/api/generaltalker/details)および[A3RT Talk API](https://a3rt.recruit.co.jp/product/talkAPI/)を[Netlify Functions](https://functions.netlify.com/)で使うためのプログラム  
 
 ## 機能
-GeneraTalker APIを使って、ユーザの書き込みに対し返事をする。  
+雑談API(GeneralTalker API / A3RT Talk API)を用いて、ユーザの書き込みに対し返事をする。  
 パブリックチャンネルではメンション、ダイレクトメッセージでは全ての書き込みに反応する。  
 
 ## 導入方法
@@ -14,7 +14,7 @@ GeneraTalker APIを使って、ユーザの書き込みに対し返事をする�
 ### Slack Bot用のAppを作る
 https://api.slack.com/apps にアクセス。  
 Create App > From scratch を選択。  
-App名を入力し、Slackのworkspaceを選択。  
+App名(これがSlack Botの名前になる)を入力し、Slackのworkspaceを選択。  
 
 ### Slack BotのSigning SecretとOAuth Tokenを取得する
 #### Signing Secretの取得
@@ -37,13 +37,21 @@ Bot User OAuth Token が表示されるので、Copyをクリックしてコピ�
 
 Signing SecretとOAuth Tokenは外に漏らさないこと。  
 
-### GeneralTalker APIのAPIキーを取得する
+### 雑談APIのAPIキーを取得する
+下記の a, bどちらかの手順を踏んで、雑談APIのAPIキーを取得する。  
+Signing SecretとOAuth Tokenと同様に、APIキーも外に漏らさないこと。  
+
+#### a. GeneralTalker APIのAPIキーを取得する
 [Rapid APIのGeneralTalkerのページ](https://rapidapi.com/morikatroninc-morikatroninc-default/api/generaltalker/pricing) にアクセス。  
 Basic プランを選択し、Subscribeをクリック。  
 [Endpoints](https://rapidapi.com/morikatroninc-morikatroninc-default/api/generaltalker) に移動。  
 画面中央より、 Header Parameters > X-RapidAPI-Key にある文字列をコピーして保管する。  
 
-Signing SecretとOAuth Tokenと同様に、APIキーも外に漏らさないこと。  
+#### b. A3RT Talk APIのAPIキーを取得する
+[A3RT Talk APIのページ](https://a3rt.recruit.co.jp/product/talkAPI/)にアクセス。  
+画面下部の API KEY 発行 をクリック。  
+利用規約とプライバシーポリシーに同意して、メールアドレスを送信。  
+指定された手順に従い、APIキーを取得する。  
 
 ### Netlifyでサイトを立ち上げる
 このリポジトリをフォークする。  
@@ -61,7 +69,9 @@ Netlifyの管理画面で、Site settings > Build & deploy > Environment > Edit 
 | ---- | ---- |
 | SLACK_SIGNING_SECRET | Slack BotのSigning Secret |
 | SLACK_BOT_TOKEN | Slack BotのOAuth Token |
-| GENERALTALKER_API_KEY | GeneralTalker APIのAPIキー |
+| CHAT_MODE | `a3rt` (A3RTを使う場合) / `generaltalker` (GeneralTalkerを使う場合)  |
+| GENERALTALKER_API_KEY | GeneralTalker APIのAPIキー (`CHAT_MODE=generaltalker`のとき) |
+| A3RT_TALK_API_KEY | A3RT Talk APIのAPIキー (`CHAT_MODE=a3rt`のとき) |
 | MY_SLACK_BOT_NAME | Slack Botの名前 |
 
 環境変数を設定し終えたら、Saveをクリック。  

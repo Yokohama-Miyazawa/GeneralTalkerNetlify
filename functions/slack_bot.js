@@ -1,7 +1,10 @@
 import { App, ExpressReceiver, directMention } from '@slack/bolt';
 import axios from 'axios';
+import FormData from 'form-data';
 
 let isDailyLimitReached = false;
+
+const chatMode = (process.env.CHAT_MODE === undefined) ? 'generaltalker' : process.env.CHAT_MODE.toLowerCase();
 
 const expressReceiver = new ExpressReceiver({
   signingSecret: `${process.env.SLACK_SIGNING_SECRET}`,
@@ -75,7 +78,28 @@ const replaceMyNameToMentionMark = (text, botId) => {
   return text.replaceAll(myNameWord, `<@${botId}>`);
 }
 
-const chat = async (message) => {
+const chatA3rtTalk = async (message) => {
+  const url = 'https://api.a3rt.recruit.co.jp/talk/v1/smalltalk';
+  const apikey = process.env.A3RT_TALK_API_KEY;
+
+  const messageText = message.text.trim();
+  console.log("inputText:", messageText);
+
+  let params = new FormData();
+  params.append('apikey', apikey);
+  params.append('query', messageText);
+
+  return axios.post(url, params).then(function (response) {
+    const responseMessage = response.data.results[0].reply
+    console.log("outputText:", responseMessage);
+    return responseMessage;
+  }).catch(function (error) {
+	  console.error(error);
+    return null;
+  });
+}
+
+const chatGeneralTalker = async (message) => {
   let messageText = message.text.trim();
   console.log("inputText:", messageText);
 
@@ -100,7 +124,7 @@ const chat = async (message) => {
 
   return axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
-	  console.log("outputText:", responseMessage);
+    console.log("outputText:", responseMessage);
     if(isDailyLimitReached) isDailyLimitReached = false;
     return responseMessage;
   }).catch(function (error) {
@@ -115,49 +139,41 @@ const chat = async (message) => {
   });
 }
 
-app.message(directMessageToBot(), async ({ message, context, say }) => {
-  let botUserId = context.botUserId;
-  let inputText = {
-    text: removeMentionSymbol(message.text, botUserId),
+const chat = async (message, context) => {
+  const inputText = {
+    text: removeMentionSymbol(message.text, context.botUserId),
     user: message.user,
     channel: message.channel
   };
-  let outputText = await chat(inputText);
-  //let outputText = `${removeMentionSymbol(message.text, botUserId)}(＾ω＾)`;
+  const outputText = (chatMode == 'a3rt') ? await chatA3rtTalk(inputText) : await chatGeneralTalker(inputText);
+  return replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), context.botUserId);
+}
+
+app.message(directMessageToBot(), async ({ message, context, say }) => {
+  let outputText = await chat(message, context);
+  //let outputText = `${removeMentionSymbol(message.text, context.botUserId)}(＾ω＾)`;
   if (outputText) {
-    let responseMessage = replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), botUserId);
+    let responseMessage = outputText;
     console.log("responseMessage:", responseMessage);
     await say(responseMessage);
   }
 });
 
 app.message(directMention(), async ({ message, context, say }) => {
-  let botUserId = context.botUserId;
-  let inputText = {
-    text: removeMentionSymbol(message.text, botUserId),
-    user: message.user,
-    channel: message.channel
-  };
-  let outputText = await chat(inputText);
-  //let outputText = `${removeMentionSymbol(message.text, botUserId)}!`;
+  let outputText = await chat(message, context);
+  //let outputText = `${removeMentionSymbol(message.text, context.botUserId)}!`;
   if (outputText) {
-    let responseMessage = addMentionMark(replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), botUserId), message.user);
+    let responseMessage = addMentionMark(outputText, message.user);
     console.log("responseMessage:", responseMessage);
     await say(responseMessage);
   }
 });
 
 app.message(threadByTheBot(), async ({ message, context }) => {
-  let botUserId = context.botUserId;
-  let inputText = {
-    text: removeMentionSymbol(message.text, botUserId),
-    user: message.user,
-    channel: message.channel
-  };
-  let outputText = await chat(inputText);
-  //let outputText = `${removeMentionSymbol(message.text, botUserId)}?`;
+  let outputText = await chatA3rtTalk(message, context);
+  //let outputText = `${removeMentionSymbol(message.text, context.botUserId)}?`;
   if (outputText) {
-    let responseMessage = replaceMyNameToMentionMark(replaceYourNameToMentionMark(outputText, message.user), botUserId);
+    let responseMessage = outputText;
     console.log("responseMessage:", responseMessage);
     await app.client.chat.postMessage({
       token: process.env.SLACK_BOT_TOKEN,
