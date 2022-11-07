@@ -124,7 +124,7 @@ const chatGeneralTalker = async (message) => {
 
   return axios.request(options).then(function (response) {
     let responseMessage = response.data.response.res;
-	  console.log("outputText:", responseMessage);
+    console.log("outputText:", responseMessage);
     if(isDailyLimitReached) isDailyLimitReached = false;
     return responseMessage;
   }).catch(function (error) {
