@@ -96,12 +96,13 @@ const chatA3rtTalk = async (message) => {
     return responseMessage;
   }).catch(function (error) {
     console.error(error);
-    return null;
+    return "API呼び出しでエラーが起きたみたいです";
   });
 }
 
 const chatGeneralTalker = async (message) => {
-  let messageText = message.text.trim();
+  const tooManyRequestsStatusCode = 429;
+  const messageText = message.text.trim();
   console.log("inputText:", messageText);
 
   const options = {
@@ -132,11 +133,15 @@ const chatGeneralTalker = async (message) => {
     console.log(error.response.status);
     console.log(error.response.statusText);
     //console.log(error.response.data.message);
-    if(!isDailyLimitReached) {
-      isDailyLimitReached = true;
-      return "今日はもう喋りたくない";
+    if(error.response.status == tooManyRequestsStatusCode) {
+      if(!isDailyLimitReached) {
+        isDailyLimitReached = true;
+        return "今日はもう喋りたくない";
+      } else {
+        return null;
+      }
     }
-    return null;
+    return "API呼び出しでエラーが起きたっぽい";
   });
 }
 
