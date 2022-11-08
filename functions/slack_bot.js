@@ -94,7 +94,7 @@ const chatA3rtTalk = async (message) => {
     console.log("outputText:", responseMessage);
     return responseMessage;
   }).catch(function (error) {
-	  console.error(error);
+    console.error(error);
     return null;
   });
 }
@@ -170,7 +170,7 @@ app.message(directMention(), async ({ message, context, say }) => {
 });
 
 app.message(threadByTheBot(), async ({ message, context }) => {
-  let outputText = await chatA3rtTalk(message, context);
+  let outputText = await chat(message, context);
   //let outputText = `${removeMentionSymbol(message.text, context.botUserId)}?`;
   if (outputText) {
     let responseMessage = outputText;
