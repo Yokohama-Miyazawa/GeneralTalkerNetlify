@@ -90,6 +90,7 @@ const chatA3rtTalk = async (message) => {
   params.append('query', messageText);
 
   return axios.post(url, params).then(function (response) {
+    if (response.data.status !== 0) throw new Error(JSON.stringify(response.data));
     const responseMessage = response.data.results[0].reply
     console.log("outputText:", responseMessage);
     return responseMessage;
